@@ -1,0 +1,270 @@
+{% extends 'layout1.html' %}
+{% block title %}
+StreamNow - Otp Verification
+{% endblock %}
+
+{%block headdata %}
+
+<div id="flashes"></div>
+
+{%endblock%}
+
+
+
+
+{% block formdiv %}
+<div class="login-wrap p-4 p-md-5" id = "form-div">
+    <div class="d-flex">
+        <div class="w-100">
+            <h3 class="mb-4">Email Verification
+
+                <p style="font-size:20px">Enter the otp send to {{email}}.</p></h3>
+        </div>
+        <div class="w-100">
+            <p class="social-media d-flex justify-content-end">
+                <a href="#"
+                    class="social-icon d-flex align-items-center justify-content-center"><span
+                        class="fa fa-facebook"></span></a>
+                <a href="#"
+                    class="social-icon d-flex align-items-center justify-content-center"><span
+                        class="fa fa-twitter"></span></a>
+            </p>
+        </div>
+    </div>
+
+
+{% if request.args.get('next') %}
+<form action="/signup/otp-verification/{{slug}}?next={{quoted_url(request.args.get('next'))}}" method="post" class="signin-form" id="otp-form">
+    {% else %}
+    <form action="/signup/otp-verification/{{slug}}" method="post" class="signin-form">
+        {% endif %}
+        <div class="form-group mb-3">
+            <label class="label" for="otp">ONE TIME PASSWORD</label>
+            <input type="text" class="form-control" placeholder="" name="otp" id="otp" minlength="6" maxlength="6"
+                pattern="[0-9]{6}" required>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="form-control btn btn-primary rounded submit px-3">Submit</button>
+        </div>
+    </form>
+    <p class="text-center">Didn't received otp? <a data-toggle="tab" onclick="resend_otp()" href=""
+            id="resend_otp_button">Resend it</a></p>
+    <p class="text-center" id="resend_otp_msg"  style = "display: none;">Resending Otp...</p>
+    <p id="countdown" class=" text-center"></p>
+    <p class="text-center" style="font-size: 13px;">(Otp is valid for only 5 minutes)</p>
+
+    </div>
+
+
+    {% endblock %}
+
+    {% block scriptfile %}
+
+
+
+    {%if request.args.get("next")%}
+
+    <script>
+        function flash_sto_error_n_redirect() {
+            $.ajax({
+                url: "/flash-sto",
+                type: "POST",
+                success: function (resp) {
+
+
+                    window.location.replace("/signup?next={{quoted_url(request.args.get('next'))}}");
+                }
+            })
+        }
+
+
+    </script>
+    {% else %}
+    <script>
+
+        function flash_sto_error_n_redirect() {
+            $.ajax({
+                url: "/flash-sto",
+                type: "POST",
+                success: function (resp) {
+
+
+                    window.location.replace("/signup");
+                }
+            })
+        }
+
+    </script>
+    {% endif %}
+
+    <script>
+
+        // For otp input --- only numbers are alowwed...
+        
+        $(function() {
+            $("input[name='otp']").on('input', function(e) {
+                $(this).val($(this).val().replace(/[^0-9]/g, ''));
+            });
+        });
+    </script>
+
+
+
+    <script>
+        
+
+        var resend_req_complete = true
+
+        function reactive_resend_button() {
+
+            let resend_button = document.getElementById("resend_otp_button")
+
+            resend_button.setAttribute("href", "")
+            resend_button.setAttribute("onclick", "resend_otp()")
+        }
+
+
+
+        function resend_otp() {
+            let resend_otp_msg = document.getElementById("resend_otp_msg")
+            let resend_button = document.getElementById("resend_otp_button")
+
+            resend_otp_msg.style.display = "block"
+            resend_button.removeAttribute("href")
+            resend_button.removeAttribute("onclick")
+
+            resend_req_complete = false
+            const decreaseResendWaitTime = setInterval(
+
+                function ChangeResendWaitTime() {
+
+                    resendWaitTime = getCookie("resendWaitTime-{{slug}}")
+
+                    if (resendWaitTime != "") {
+                        resendWaitTime = parseInt(resendWaitTime)
+                        resendWaitTime -= 1
+                        setCookie("resendWaitTime-{{slug}}", `${resendWaitTime}`, 30 / (24 * 60 * 60) , false);
+                        if (resendWaitTime == 0 && resend_req_complete == true) {
+                            reactive_resend_button()
+                            deleteCookie("resendWaitTime-{{slug}}")
+                            clearInterval(decreaseResendWaitTime)
+                        }
+                        else{
+                            // wait...
+                        }
+
+                    }
+                    else {
+
+                        if (checkCookie()) {
+                            setCookie("resendWaitTime-{{slug}}", "30", 30 / (24 * 60 * 60) , false);
+                        }
+                        else {
+                            reactive_resend_button()
+                            clearInterval(decreaseResendWaitTime)
+                        }
+
+                    }
+
+                }, 1000)
+
+
+            $.ajax({
+                url: "/signup/otp-verification/resend/{{slug}}",
+                type: "POST",
+                success: function (resp) {
+                    let elee = document.getElementById("flashes")
+                    console.log(resp)
+                    if (resp == "Operation Failed!") {
+                        elee.innerHTML = `<div class="alert alert-danger alert-dismissible fade show" role="alert"><span>There was some problem in sending the Email! Try again after some time.<i></i></span><button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button></div >`
+                        resend_otp_msg.style.display = "none"
+                        resend_req_complete = true
+
+                    }
+                    else if (resp == "Session Timed Out!") {
+                        elee.innerHTML = `<div class="alert alert-danger alert-dismissible fade show" role="alert"><span>Session Timed Out!!<i></i></span><button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button></div >`
+                        resend_otp_msg.style.display = "none"
+                        resend_req_complete = true
+
+                    }
+                    else {
+                        elee.innerHTML = `<div class="alert alert-success alert-dismissible fade show" role="alert">Otp has been resended to your email Successfully!
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button></div>`
+                        resend_otp_msg.style.display = "none"
+                        resend_req_complete = true
+
+
+                    }
+                }
+            })
+
+        }
+
+        var timeleft = getCookie("timeleft");
+
+        if (timeleft != "") {
+            timeleft = parseInt(timeleft)
+            var countdown = document.getElementById("countdown");
+            var downloadTimer = setInterval(function () {
+                if (timeleft <= 0) {
+                    clearInterval(downloadTimer);
+                    flash_sto_error_n_redirect()
+                };
+                let minutes = Math.floor(timeleft / 60);
+                let seconds = (timeleft - (minutes * 60)).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+                countdown.innerHTML = `<p id = "conuntdown" class=" text-center" >` + minutes + `:` + seconds + `</p>`;
+                timeleft -= 1;
+                setCookie("timeleft", `${timeleft}`, 300 / (24 * 60 * 60) , false);
+            }, 1000);
+
+        }
+        else {
+
+        }
+
+        var resendWaitTime = getCookie("resendWaitTime-{{slug}}")
+        if (resendWaitTime != "") {
+            let resend_button = document.getElementById("resend_otp_button")
+
+            resend_button.removeAttribute("href")
+            resend_button.removeAttribute("onclick")
+
+            const decreaseResendWaitTime = setInterval(
+
+                function ChangeResendWaitTime() {
+
+                    resendWaitTime = getCookie("resendWaitTime-{{slug}}")
+                    console.log(resendWaitTime)
+
+                    if (resendWaitTime != "") {
+                        resendWaitTime = parseInt(resendWaitTime)
+                        resendWaitTime -= 1
+                        setCookie("resendWaitTime-{{slug}}", `${resendWaitTime}`, 30 / (24 * 60 * 60) , false);
+                        if (resendWaitTime == 0) {
+                            reactive_resend_button()
+                            deleteCookie("resendWaitTime-{{slug}}")
+                            clearInterval(decreaseResendWaitTime)
+                        }
+
+                    }
+                    else {
+                        clearInterval(decreaseResendWaitTime)
+                    }
+
+                }, 1000)
+
+
+        }
+        else {
+
+        }
+
+
+    </script>
+    {% endblock %}

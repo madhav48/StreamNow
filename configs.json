@@ -1,0 +1,11 @@
+{
+    "mysql_user" : "root",
+    "mysql_password" : "mainhoondon",
+    "local_host": "mysql://[root]:[mainhoondon]@localhost",
+    "verify-email-id": "streamnowverify@gmail.com",
+    "verify-email-password": "ybjvllgnutxoncjg",
+    "SECRET_KEY" : "bbyh8hU9NN8Jj9j&(kmklm@91494196",
+    "local_host_sn_users" : "mysql://root:mainhoondon@localhost/sn_users",
+    "domain_name" : "http://127.0.0.1:5000"
+}
+

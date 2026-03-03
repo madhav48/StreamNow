@@ -1,0 +1,330 @@
+{% extends 'layout1.html' %}
+{% block title %}
+StreamNow - Log In
+{% endblock %}
+
+{%block headdata %}
+
+{%endblock%}
+
+
+
+
+{% block formdiv %}
+
+
+
+{% if user_saved != True %}
+
+
+<div class="login-wrap p-4 p-md-5" id = "form-div">
+    <div class="d-flex">
+        <div class="w-100">
+            <h3 class="mb-4">Log In</h3>
+        </div>
+        <div class="w-100">
+            <p class="social-media d-flex justify-content-end">
+                <a href="#"
+                    class="social-icon d-flex align-items-center justify-content-center"><span
+                        class="fa fa-facebook"></span></a>
+                <a href="#"
+                    class="social-icon d-flex align-items-center justify-content-center"><span
+                        class="fa fa-twitter"></span></a>
+            </p>
+        </div>
+    </div>
+
+<form action="{{request.environ['RAW_URI']}}" method="post" class="signin-form">
+	<div class="form-group mb-3">
+		<label class="label" for="email">Email</label>
+		<input type="email" class="form-control" placeholder="Email" name="email" id="email" value="{{values.email}}"
+			required>
+	</div>
+	<div class="form-group mb-3">
+		<label class="label" for="password">Password</label>
+		<input type="password" class="form-control" name="password" id="password" maxlength="256" placeholder="Password"
+			required>
+	</div>
+	<div class="form-group">
+		<button type="submit" class="form-control btn btn-primary rounded submit px-3" id = "login-btn">Log In</button>
+	</div>
+	<div class="form-group d-md-flex">
+		<div class="w-50 text-left">
+			<label class="checkbox-wrap checkbox-primary mb-0">Remember Me
+				<input type="checkbox" {{values.remember_check}} id="remember" name="remember">
+				<span class="checkmark"></span>
+			</label>
+		</div>
+		<div class="w-50 text-md-right">
+			<a href="/forgot-password">Forgot Password</a>
+		</div>
+	</div>
+</form>
+
+{%if request.args.get("next")%}
+	<p class="text-center">Don't Have An Account? <a href="signup?next={{quoted_url(request.args.get('next'))}}">Sign Up</a></p>
+	{% else %}
+	<p class="text-center">Don't Have An Account? <a href="signup">Sign Up</a></p>
+{% endif %}
+
+
+<p class="text-center">OR</p>
+<div class="">
+	<button type="submit" class="form-control btn btn-primary rounded submit px-3" id = "userid-login-btn">Log In Using User Id</button>
+</div>
+
+</div>
+
+{% else %}
+
+
+<div class="login-wrap p-4 p-md-5" id = "form-div">
+    <div class="d-flex">
+        <div class="w-100">
+            <h3 class="mb-4">Log In</h3>
+        </div>
+        <div class="w-100">
+            <p class="social-media d-flex justify-content-end">
+                <a href="#"
+                    class="social-icon d-flex align-items-center justify-content-center"><span
+                        class="fa fa-facebook"></span></a>
+                <a href="#"
+                    class="social-icon d-flex align-items-center justify-content-center"><span
+                        class="fa fa-twitter"></span></a>
+            </p>
+        </div>
+    </div>
+	
+	{%if request.args.get("next")%}
+	<form action="/login?next={{quoted_url(request.args.get('next'))}}" method="post" class="signin-form">
+	{% else %}
+	<form action="/login" method="post" class="signin-form">
+	{% endif %}
+
+	<div class="form-group mb-3">
+		<input type="hidden" class="form-control" name="saved-userid" id="saved-userid" maxlength="8" value="{{saved_user_id}}">
+	</div>
+
+	<div class="form-group">
+		<button type="submit" class="form-control btn btn-primary rounded submit px-3" id = "saved-account-login-btn">Log In As {{saved_user_name}} ({{saved_user_id}})</button>
+	</div>
+	</form>
+
+	<form action="" class="signin-form">
+
+	<p class="text-center">OR</p>
+	<div class="">
+		<button type="submit" class="form-control btn btn-primary rounded submit px-3" id = "emailpass-login-btn">Log Into Another Account</button>
+	</div>
+</form>
+
+</div>
+
+
+
+
+{% endif %}
+
+
+
+
+
+
+{% endblock %}
+
+
+
+
+{% block scriptfile %}
+<script>
+	
+	$('#login-btn').on("click",function(e){
+		if (!checkCookie()){
+			alert("Please enable the cookies to LogIn.");
+			e.preventDefault();
+		}
+	});
+
+	$('#userid-login-btn').on("click",function(e){
+		
+		e.preventDefault()
+
+		formDiv = $('#form-div')
+		formDiv.empty()
+
+		formDivChild = `    <div class="d-flex">
+			<div class="w-100">
+				<h3 class="mb-4">Log In</h3>
+			</div>
+			<div class="w-100">
+				<p class="social-media d-flex justify-content-end">
+					<a href="#"
+						class="social-icon d-flex align-items-center justify-content-center"><span
+							class="fa fa-facebook"></span></a>
+					<a href="#"
+						class="social-icon d-flex align-items-center justify-content-center"><span
+							class="fa fa-twitter"></span></a>
+				</p>
+			</div>
+		</div>
+	
+	<form action="{{request.environ['RAW_URI']}}" method="post" class="signin-form">
+		<div class="form-group mb-3">
+			<label class="label" for="userid">User Id</label>
+			<input type="text" class="form-control" placeholder="Email" name="userid" id="userid" value="{{values.email}}"
+				required>
+		</div>
+		<div class="form-group mb-3">
+			<label class="label" for="password">Password</label>
+			<input type="password" class="form-control" name="password" id="password" maxlength="256" placeholder="Password"
+				required>
+		</div>
+		<div class="form-group">
+			<button type="submit" class="form-control btn btn-primary rounded submit px-3" id = "login-btn">Log In</button>
+		</div>
+		<div class="form-group d-md-flex">
+			<div class="w-50 text-left">
+				<label class="checkbox-wrap checkbox-primary mb-0">Remember Me
+					<input type="checkbox" {{values.remember_check}} id="remember" name="remember">
+					<span class="checkmark"></span>
+				</label>
+			</div>
+			<div class="w-50 text-md-right">
+				<a href="/forgot-password">Forgot Password</a>
+			</div>
+		</div>
+	</form>
+	
+	{%if request.args.get("next")%}
+		<p class="text-center">Don't Have An Account? <a href="signup?next={{quoted_url(request.args.get('next'))}}">Sign Up</a></p>
+		{% else %}
+		<p class="text-center">Don't Have An Account? <a href="signup">Sign Up</a></p>
+		{% endif %}
+		
+		<p class="text-center">OR</p>
+		<div class="">
+			<button type="button" class="form-control btn btn-primary rounded submit px-3" id = "emailpass-login-btn">Log In Using Email</button>
+		</div>
+		
+		
+		{% if user_saved == True %}
+		<p class="text-center">OR</p>
+
+
+	{%if request.args.get("next")%}
+	<form action="/login?saved-userid={{saved_user_id}}&next={{quoted_url(request.args.get('next'))}}" method="post" class="signin-form">
+	{% else %}
+	<form action="/login?saved-userid={{saved_user_id}}" method="post" class="signin-form">
+	{% endif %}
+
+	<div class="form-group mb-3">
+		<input type="hidden" class="form-control" name="saved-userid" id="saved-userid" maxlength="8" value="{{saved_user_id}}">
+	</div>
+
+
+	<div class="form-group">
+		<button type="submit" class="form-control btn btn-primary rounded submit px-3" id = "saved-account-login-btn">Log In As {{saved_user_name}} ({{saved_user_id}})</button>
+	</div>
+	</form>
+
+	{% endif %}
+
+	`
+
+	formDiv.append(formDivChild)
+
+	});
+
+
+	$('#emailpass-login-btn').on("click",function(e){
+
+
+		console.log("hii")
+
+		formDiv = $('#form-div')
+		formDiv.empty()
+
+		formDivChild = `    <div class="d-flex">
+			<div class="w-100">
+				<h3 class="mb-4">Log In</h3>
+			</div>
+			<div class="w-100">
+				<p class="social-media d-flex justify-content-end">
+					<a href="#"
+						class="social-icon d-flex align-items-center justify-content-center"><span
+							class="fa fa-facebook"></span></a>
+					<a href="#"
+						class="social-icon d-flex align-items-center justify-content-center"><span
+							class="fa fa-twitter"></span></a>
+				</p>
+			</div>
+		</div>
+	
+	<form action="{{request.environ['RAW_URI']}}" method="post" class="signin-form">
+		<div class="form-group mb-3">
+			<label class="label" for="email">Email</label>
+			<input type="email" class="form-control" placeholder="Email" name="email" id="email" value="{{values.email}}"
+				required>
+		</div>
+		<div class="form-group mb-3">
+			<label class="label" for="password">Password</label>
+			<input type="password" class="form-control" name="password" id="password" maxlength="256" placeholder="Password"
+				required>
+		</div>
+		<div class="form-group">
+			<button type="submit" class="form-control btn btn-primary rounded submit px-3" id = "login-btn">Log In</button>
+		</div>
+		<div class="form-group d-md-flex">
+			<div class="w-50 text-left">
+				<label class="checkbox-wrap checkbox-primary mb-0">Remember Me
+					<input type="checkbox" {{values.remember_check}} id="remember" name="remember">
+					<span class="checkmark"></span>
+				</label>
+			</div>
+			<div class="w-50 text-md-right">
+				<a href="/forgot-password">Forgot Password</a>
+			</div>
+		</div>
+	</form>
+	
+	{%if request.args.get("next")%}
+		<p class="text-center">Don't Have An Account? <a href="signup?next={{quoted_url(request.args.get('next'))}}">Sign Up</a></p>
+		{% else %}
+		<p class="text-center">Don't Have An Account? <a href="signup">Sign Up</a></p>
+		{% endif %}
+
+		<p class="text-center">OR</p>
+		<div class="">
+			<button type="button" class="form-control btn btn-primary rounded submit px-3" id = "emailpass-login-btn">Log In Using Email</button>
+		</div>
+
+		
+		{% if user_saved == True %}
+		<p class="text-center">OR</p>
+
+
+	{%if request.args.get("next")%}
+	<form action="/login?saved-userid={{saved_user_id}}&next={{quoted_url(request.args.get('next'))}}" method="post" class="signin-form">
+	{% else %}
+	<form action="/login?saved-userid={{saved_user_id}}" method="post" class="signin-form">
+	{% endif %}
+
+	<div class="form-group mb-3">
+		<input type="hidden" class="form-control" name="saved-userid" id="saved-userid" maxlength="8" value="{{saved_user_id}}">
+	</div>
+
+
+	<div class="form-group">
+		<button type="submit" class="form-control btn btn-primary rounded submit px-3" id = "saved-account-login-btn">Log In As {{saved_user_name}} ({{saved_user_id}})</button>
+	</div>
+	</form>
+
+	{% endif %}
+
+	`
+
+	formDiv.append(formDivChild)
+	});
+
+</script>
+{% endblock %}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamNow - The Best Music Streaming App</title>
+
+
+
+    <script src="{{ url_for('static' , filename = 'js/jquery.min.js')}}"></script>
+    <script src="{{ url_for('static' , filename = 'js/popper.js')}}"></script>
+    <script src="{{ url_for('static' , filename = 'js/bootstrap.min.js')}}"></script>
+    <script src="{{ url_for('static' , filename = 'js/main.js')}}"></script>
+    <script src="{{ url_for('static' , filename = 'js/cookies.js')}}"></script>
+
+</head>
+
+<body>
+
+    <h1>StreamNow - Your Music Buddy.</h1>
+    <!-- <audio controls>
+        <source
+            src="{{ url_for('static', filename='Balti - Ya Lili feat. Hamouda (Starix & XZEEZ Remix) Need For Speed [Chase Scene].mp3') }}"
+            type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio> -->
+
+
+    {{current_user}}
+    <br>
+    {{current_user.is_authenticated}}
+    {{current_user.name}}
+    <a href="/login">login</a>
+    <br><br>
+    {{session}}
+    <br>
+    <br>
+{{request}}
+    <br><br>
+    <a href="" id="logout-button">logout</a>
+</body>
+
+<script>
+    $('#logout-button').on("click", function (e) {
+
+        e.preventDefault()
+    
+        confirmSaveDetails = confirm("Do you want to save login details for future login?")
+        if (confirmSaveDetails == true){
+            
+            window.location.href = "/logout?save-login-details={{current_user.id}}&next=" + window.location.pathname
+            
+            
+        }
+        else{
+            window.location.href = "/logout?next=" + window.location.pathname
+
+        }
+    
+    });
+
+
+</script>
+
+
+</html>

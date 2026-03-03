@@ -1,0 +1,10 @@
+# Check about flask session cookies  and how to secure them , how to make them unwritable.........
+
+#  Forgot Password
+#  Login using otp...
+
+
+
+$ Ongoing task ----
+
+--------- Log in through many ways --------------()
